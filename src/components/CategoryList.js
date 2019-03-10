@@ -17,7 +17,7 @@ class CategoryList extends Component {
     renderCategory(category) {
         return <div key={category.name}>
             <b>{category.name}</b>
-            (created by: {category.uid.displayName})
+            (created by: {category.user.displayName})
         </div>
     }
 
@@ -26,7 +26,7 @@ class CategoryList extends Component {
         const {categories} = this.props;
 
         if (!categories) {
-            return <div />
+            return <div/>
         }
 
         console.log('categories', categories);
@@ -48,9 +48,23 @@ class CategoryList extends Component {
 
 const collection = 'categories';
 
-const populates = [
-    {child: 'uid', root: 'users'} // replace uid with user object
-];
+
+const populates = (dataKey, originalData) => {
+    console.log('populates', dataKey, originalData);
+    // debugger;
+    if (dataKey === 'categories') {
+        Object.keys(originalData).forEach((key) => { originalData[key].user = originalData[key].userRef.path.split('/')[1] })
+    }
+    else if (dataKey) {
+        originalData['user'] = originalData.userRef.path.split('/')[1];
+    }
+    return [{child: 'user', root: 'users'}]
+};
+
+// const populates = [
+//     {child: 'user', root: 'users'} // replace uid with user object
+//     // {child: 'userRef', root: 'users'} // replace uid with user object
+// ];
 
 const mapStateToProps = state => {
     return {
@@ -63,12 +77,16 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {};
 
 export default compose(
-    firestoreConnect((props) => [
-        {
-            collection,
-            populates
+    firestoreConnect(
+        (props) => {
+            return [
+                {
+                    collection,
+                    populates
+                }
+            ]
         }
-    ]),
+    ),
     connect(mapStateToProps, mapDispatchToProps),
 )(CategoryList)
 
