@@ -46,7 +46,7 @@ const collection = 'categories';
 
 const populates = (dataKey, originalData) => {
 
-   if (originalData && originalData['userRef'] && !originalData['userData']) {
+    if (originalData && originalData['userRef'] && !originalData['userData']) {
         originalData['userData'] = originalData.userRef.path.split('/')[1];
     }
 
@@ -63,16 +63,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {};
 
 export default compose(
-    firestoreConnect(
-        (props) => {
-            return [
-                {
-                    collection,
-                    populates
-                }
-            ]
-        }
-    ),
+    firestoreConnect([{collection, populates}]),
     connect(mapStateToProps, mapDispatchToProps),
 )(CategoryList)
 
